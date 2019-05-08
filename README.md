@@ -8,5 +8,7 @@ The next step is to inlude function.json generation scripts in this project as w
 - npm install
 - npm start
 
+Check out app.ts code
+
 ### Disclaimer
 I wanted to show that code in `common` and `functions` can be structured however you like. Worth thinking about what pattern we actually want to encourage, especially with how we want to do templates.

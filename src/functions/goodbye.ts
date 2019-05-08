@@ -2,6 +2,7 @@ import { AzureFunction, Context } from "@azure/functions"
 import { Function2, HttpTrigger, BlobInput } from "../../future_node_modules/functions/azure-functions"
 import { CookiedRequest } from "../common/interfaces"
 
+// More traditional look of an Azure Function + registering by creating a "Function2" object
 const farewell: AzureFunction = async function (context: Context): Promise<void> {    
     // Log info from request cookie
     const req = context.req as CookiedRequest;
