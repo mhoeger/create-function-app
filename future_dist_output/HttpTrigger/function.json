@@ -16,6 +16,6 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../../dist/app.js",
+  "scriptFile": "../../dist/src/app.js",
   "entryPoint": "HttpTrigger1"
 }
