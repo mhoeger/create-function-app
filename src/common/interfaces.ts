@@ -1,9 +1,10 @@
 import { Context, HttpRequest } from "@azure/functions"
 
-export interface NamedContext extends Context {
+export interface InvocationContext extends Context {
     name: string;
+    req: CookieRequest;
 }
 
-export interface CookiedRequest extends HttpRequest {
+interface CookieRequest extends HttpRequest {
     cookies: any;
 }
