@@ -1,4 +1,4 @@
-import { FunctionApp } from "../future_node_modules/functions/azure-functions"
+import { FunctionApp, HttpTrigger } from "../future_node_modules/functions/azure-functions"
 import { Context } from "@azure/functions"
 import { NamedContext } from "./common/interfaces"
 import { helloFunction } from "./functions/hello"
@@ -8,8 +8,8 @@ var cookieParser = require("cookie-parser");
 const app = new FunctionApp();
 
 // register functionss
-app.function(helloFunction)
-   .function(goodbyeFunction);
+app.onTrigger(new HttpTrigger("api/bye", ["GET"]), goodbyeFunction)
+   .onTrigger(new HttpTrigger("api/hi", ["GET"]), helloFunction);
 
 app.pre(async (context: Context) => {
     context.log('~~ wow middleware ~~');
