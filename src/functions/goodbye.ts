@@ -1,9 +1,9 @@
-import { AzureFunction, Context } from "@azure/functions"
+import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { Function2, HttpTrigger, BlobInput } from "../../future_node_modules/functions/azure-functions"
 import { CookiedRequest } from "../common/interfaces"
 
 // More traditional look of an Azure Function + registering by creating a "Function2" object
-const farewell: AzureFunction = async function (context: Context): Promise<void> {    
+const farewell: AzureFunction = async function (context: Context, r: HttpRequest, blobInput: string): Promise<void> {    
     // Log info from request cookie
     const req = context.req as CookiedRequest;
     const previousInvocationId = req.cookies.invocationId;
@@ -22,7 +22,10 @@ const farewell: AzureFunction = async function (context: Context): Promise<void>
     };
 };
 
-export const goodbyeFunction = new Function2(new HttpTrigger("api/bye", ["GET"]))
+//// TypeScript help on inputs and stuff 
+//// maybe do bindings different. 
+//// triggers (FunctionApp) separated from binding (Function)?
+export const goodbyeFunction = new Function2("GoodbyeFunction", new HttpTrigger("api/bye", ["GET"]))
     .bindInputs([
         new BlobInput("blobInput")
     ])

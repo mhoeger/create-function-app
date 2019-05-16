@@ -3,7 +3,7 @@ import { NamedContext } from "../common/interfaces"
 import { createResponse } from "../common/talkToPerson"
 
 // Newer look of an Azure Function. Note that it may be dangerous to not call "context.done" or forget to declare async
-export const helloFunction = new Function2(new HttpTrigger("api/hi", ["GET"]))
+export const helloFunction = new Function2("MyFunctionsIsAwesome", new HttpTrigger("api/hi", ["GET"]))
     .bindInputs([
         new BlobInput("blobInput")
     ])
