@@ -1,4 +1,4 @@
-import { Function2, HttpTrigger, BlobInput } from "../../future_node_modules/functions/azure-functions"
+import { Function2 } from "../../future_node_modules/functions/azure-functions"
 import { InvocationContext } from "../common/interfaces"
 import { createResponse } from "../common/talkToPerson"
 import { AzureFunction } from "@azure/functions";

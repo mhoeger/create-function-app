@@ -1,5 +1,4 @@
 import { FunctionApp, HttpTrigger } from "../future_node_modules/functions/azure-functions"
-import { Context } from "@azure/functions"
 import { InvocationContext } from "./common/interfaces"
 import { helloFunction } from "./functions/hello"
 import { goodbyeFunction } from "./functions/goodbye"

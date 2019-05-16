@@ -1,4 +1,4 @@
-import { AzureFunction, Context } from "@azure/functions"
+import { AzureFunction } from "@azure/functions"
 import { Function2, BlobInput } from "../../future_node_modules/functions/azure-functions"
 import { InvocationContext } from "../common/interfaces"
 
