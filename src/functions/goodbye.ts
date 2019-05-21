@@ -1,5 +1,5 @@
 import { AzureFunction } from "@azure/functions"
-import { Function2, BlobInput } from "../../future_node_modules/functions/azure-functions"
+import { AzFunction, BlobInput } from "../../future_node_modules/functions/azure-functions"
 import { InvocationContext } from "../common/interfaces"
 
 // More traditional look of an Azure Function + registering by creating a "Function2" object
@@ -27,4 +27,4 @@ const bindingOptions = {
     outputs: [ ]
 };
 
-export const goodbyeFunction = new Function2("GoodbyeFunction", farewell, bindingOptions);
+export const goodbyeFunction = new AzFunction("GoodbyeFunction", farewell, bindingOptions);

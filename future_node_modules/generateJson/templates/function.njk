@@ -1,0 +1,44 @@
+{
+  {%- if disabled %}
+  "disabled" : "{{disabled}}",
+  {%- endif %}
+  {%- if excluded %}
+  "excluded" : "{{excluded}}",
+  {%- endif %}
+  {%- if scriptFile %}
+  "scriptFile" : "{{scriptFile}}",
+  {%- endif %}
+  {%- if entryPoint %}
+  "entryPoint" : "{{entryPoint}}",
+  {%- endif %}
+  {%- if configurationSource %}
+  "configurationSource": "{{configurationSource}}",
+  {%- endif %}
+  "bindings": [
+      {
+          "name" : {{json(trigger.name)|safe}},
+          "type" : {{json(trigger.type)|safe}},
+          "direction" : {{json(trigger.direction)|safe}}{{ "," if trigger.attributes|length }}
+          {%- for attr in trigger.attributes %}
+          {{json(attr[0])|safe}} : {{json(attr[1])|safe}}{{ "," if not loop.last }}
+          {%- endfor %}
+      }{{ "," if output or bindings }}
+      {%- if output %}
+      {
+          "name" : {{json(output.name)|safe}},
+          "type" : {{json(output.type)|safe}},
+          "direction" : {{json(output.direction)|safe}}{{ "," if output.attributes|length }}
+          {%- for attr in output.attributes %}
+          {{json(attr[0])|safe}} : {{json(attr[1])|safe}}{{ "," if not loop.last }}
+          {%- endfor %}
+      }
+      {%- endif %}
+      {%- for binding in bindings %}
+        {
+            {%- for value in binding.attributes %}
+            "{{value[0]}}": {{value[1]|safe}}{{ "," if not loop.last }}
+            {%- endfor %}
+        }{{ "," if not loop.last }}
+      {%- endfor%}
+  ]
+}

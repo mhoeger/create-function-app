@@ -13,13 +13,14 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "@types/node": "^11.13.10",
     "azure-function-express": "^2.0.0",
     "cookie-parser": "^1.4.4",
     "express": "^4.16.4"
   },
   "devDependencies": {
+    "@types/node": "^11.13.10",
     "@azure/functions": "^1.0.2-beta2",
+    "nunjucks": "^3.2.0",
     "typescript": "^3.3.3"
   }
 }
