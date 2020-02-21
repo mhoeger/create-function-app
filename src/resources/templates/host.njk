@@ -1,0 +1,12 @@
+{
+  "version" : "2.0",
+  {%- if extensionBundle %}
+  "extensionBundle" : {
+      "id": "{{extensionBundle.id}}",
+      "version": "{{extensionBundle.version}}"
+  },
+  {%- endif %}
+  {%- if http %}
+  "http" : {{JSON.stringify(http)}},
+  {%- endif %}
+}

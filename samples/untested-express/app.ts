@@ -1,4 +1,5 @@
-import { FunctionApp } from "../future_node_modules/functions/azure-functions"
+import { FunctionApp } from "../../dist/src/azure-functions"
+
 const express = require("express");
 
 // Create express app as usual
