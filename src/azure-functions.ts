@@ -14,7 +14,7 @@ export class FunctionApp {
     private count = 1;
     private _middleware = async (context) => { };
     private _endware = async(context) => { };
-    private _functionConfigurations: AzureFunctionDefinition[];
+    private _functionConfigurations: AzureFunctionDefinition[] = [];
     private _hostOptions;
 
     private readonly defaultHostOptions: HostOptions = {
@@ -33,8 +33,8 @@ export class FunctionApp {
         this._functionConfigurations = functions;
         this._hostOptions = Object.assign({}, this.defaultHostOptions, options, this.requiredHostOptions);        
         for (const func of functions) {
-            const name = func.name || `${func.trigger.type}${this.count++}`;
-            this.addFunction(name, func.handler);
+            const name = this.resolveName(func.trigger.type, func.name);
+            this.addFunctionInternal(name, func.handler);
         }
     }
 
@@ -51,8 +51,31 @@ export class FunctionApp {
         // TODO
     }
 
+    public addFunction(trigger: Trigger, handler: AzureFunction, name?: string, inputBindings?: (InputBinding|InOutBinding)[], outputBindings?: OutputBinding[]) {
+        this._functionConfigurations.push({
+            trigger,
+            handler,
+            name,
+            inputBindings,
+            outputBindings
+        });
+        const resolvedName = this.resolveName(trigger.type, name);
+        this.addFunctionInternal(resolvedName, handler);
+    }
+
+    private resolveName(triggerType: string, givenName?: string) {
+        let name = givenName || `${triggerType}${this.count++}`;
+        // Prioritize most common path
+        if (name && !this[name]) {
+            return name;
+        // Conflict exists
+        } else {
+            this.resolveName("", `${name}-copy`);
+        }
+    }
+ 
     // todo: warn on no http response as output?
-    private addFunction(name: string, funcCode: AzureFunction) {
+    private addFunctionInternal(name: string, funcCode: AzureFunction) {
         this[`${name}`] = async (context, ...args) => {
             let finalValue = null;
             let next = () => { finalValue = funcCode(context, ...args) };
