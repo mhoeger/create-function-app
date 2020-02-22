@@ -162,8 +162,8 @@ export class EventHubOutput implements EventHubBinding {
     public type: string = "eventHub";
     public direction: "out" = "out";
     public name: string;
-    constructor(bindingName: string) {
-        this.name = bindingName
+    constructor(setup: { bindingName: string }) {
+        this.name = setup.bindingName
     }
 }
 
@@ -208,10 +208,14 @@ export class QueueTrigger implements QueueBinding {
     public name: string;
     public queueName: string;
     public connection: string;
-    constructor(bindingName: string, queueName: string, connection: string) {
-        this.queueName = queueName;
-        this.connection = connection;
-        this.name = bindingName;
+    constructor(setup: {
+        bindingName: string, 
+        queueName: string, 
+        connectionSetting: string
+    }) {
+        this.queueName = setup.queueName;
+        this.connection = setup.connectionSetting;
+        this.name = setup.bindingName;
     }
 }
 
@@ -221,10 +225,14 @@ export class QueueOutput implements QueueBinding {
     public name: string;
     public queueName: string;
     public connection: string;
-    constructor(bindingName: string, queueName: string, connection: string) {
-        this.queueName = queueName;
-        this.connection = connection;
-        this.name = bindingName;
+    constructor(setup: {
+        bindingName: string, 
+        queueName: string, 
+        connectionSetting: string
+    }) {
+        this.queueName = setup.queueName;
+        this.connection = setup.connectionSetting;
+        this.name = setup.bindingName;
     }
 }
 
@@ -248,12 +256,17 @@ export class HttpTrigger implements Trigger {
      */
     public authLevel: "anonymous" | "function" | "admin" = "function";
     public methods: ("get" | "post" | "delete" | "head" | "patch" | "put" | "options" | "trace")[];
-    constructor(bindingName: string, route: string, methods: ("get" | "post" | "delete" | "head" | "patch" | "put" | "options" | "trace")[], authLevel?: "anonymous" | "function" | "admin", webHookType?: string) {
-        this.name = bindingName;
-        this.route = route;
-        this.methods = methods;
-        this.authLevel = authLevel;
-        this.webHookType = webHookType;
+    constructor(setup: {
+        bindingName: string, route: string, 
+        methods: ("get" | "post" | "delete" | "head" | "patch" | "put" | "options" | "trace")[], 
+        authLevel?: "anonymous" | "function" | "admin", 
+        webHookType?: string 
+    }) {
+        this.name = setup.bindingName;
+        this.route = setup.route;
+        this.methods = setup.methods;
+        this.authLevel = setup.authLevel;
+        this.webHookType = setup.webHookType;
     }
 }
 
@@ -264,7 +277,7 @@ export class HttpResponse implements OutputBinding {
     public name: string;
     public type: string = "http";
     public direction: "out" = "out";
-    constructor(bindingName: string) {
-        this.name = bindingName;
+    constructor(setup: { bindingName: string }) {
+        this.name = setup.bindingName;
     }
 }

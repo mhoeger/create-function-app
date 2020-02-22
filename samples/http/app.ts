@@ -9,26 +9,48 @@ import { CosmosClient } from "./services/fake-clients"
 
 const functions: AzureFunctionDefinition[] = [
     {
-        trigger: new HttpTrigger("req", "/order", ["post"], "anonymous"),
+        trigger: new HttpTrigger({
+            bindingName: "req",
+            route: "/order",
+            methods: ["post"],
+            authLevel: "anonymous"
+        }),
         handler: sayHello,
         outputBindings: [
-            new HttpResponse("res"),
-            new QueueOutput("orderMessage", "order-messages", "AzureStorage")
+            new HttpResponse({ bindingName: "res" }),
+            new QueueOutput({
+                bindingName: "orderMessage",
+                queueName: "order-messages",
+                connectionSetting: "AzureStorage"
+            })
         ],
     },
     { 
-        trigger: new HttpTrigger("req", "/order", ["delete"], "anonymous"),
+        trigger: new HttpTrigger({
+            bindingName: "req",
+            route: "/order",
+            methods: ["delete"],
+            authLevel: "anonymous"
+        }),
         handler: sayHello,
         outputBindings: [
-            new HttpResponse("res"),
-            new QueueOutput("deleteMessage", "delete-messages", "AzureStorage")
+            new HttpResponse({ bindingName: "res" }),
+            new QueueOutput({
+                bindingName: "deleteMessage", 
+                queueName: "delete-messages",
+                connectionSetting: "AzureStorage"
+            })
         ]
     },
-    { 
-        trigger: new QueueTrigger("queueInput", "queuename", "AzureStorage"),
+    {
+        trigger: new QueueTrigger({
+            bindingName: "queueInput", 
+            queueName: "queuename",
+            connectionSetting: "AzureStorage"
+        }),
         handler: sayGoodbye,
         outputBindings: [
-            new EventHubOutput("eventHubMessage")
+            new EventHubOutput({ bindingName: "eventHubMessage" })
         ]
     }
 ]
