@@ -5,7 +5,7 @@ import { HostOptions } from "../../src/hostConfig"
 import { InvocationContext } from "./common/interfaces"
 import { sayHello } from "./functions/hello"
 import { sayGoodbye } from "./functions/goodbye"
-import { CosmosClient } from "./services/fake-clients"
+import { getExampleClient } from "./services/fake-clients"
 
 const functions: AzureFunctionDefinition[] = [
     {
@@ -25,7 +25,7 @@ const functions: AzureFunctionDefinition[] = [
             })
         ],
     },
-    { 
+    {
         trigger: new HttpTrigger({
             bindingName: "req",
             route: "/order",
@@ -65,15 +65,16 @@ const options: HostOptions = {
 };
 
 // - local.settings.json??? also host.json not needed??
-const app = new FunctionApp(functions, options);
+const app = new FunctionApp({
+    functions,
+    options
+});
 // before each function, do this
 // beforeeach on trigger type
 // for
-let cosmosClient = new CosmosClient();
-
 app.beforeEach(async (context: InvocationContext) => {
     context.log(`~~ Starting invocation: '${context.invocationId}' ~~`);
-    context.cosmosClient = cosmosClient;
+    context.exampleClient = getExampleClient();
 });
 
 app.beforeEach(async (context: InvocationContext) => {

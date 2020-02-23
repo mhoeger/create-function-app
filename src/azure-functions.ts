@@ -29,7 +29,8 @@ export class FunctionApp {
     };
 
     // host.json and local.settings.json... what to do??
-    constructor(functions: AzureFunctionDefinition[], options?: HostOptions) {
+    constructor(setup: { functions: AzureFunctionDefinition[], options?: HostOptions }) {
+        let { functions, options } = setup; 
         this._functionConfigurations = functions;
         this._hostOptions = Object.assign({}, this.defaultHostOptions, options, this.requiredHostOptions);        
         for (const func of functions) {
