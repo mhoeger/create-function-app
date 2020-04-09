@@ -21,7 +21,7 @@
     "cookie-parser": "^1.4.4",
     "express": "^4.16.4",
     "json-schema-to-typescript": "^8.0.1",
-    "nunjucks": "^3.2.0",
+    "nunjucks": "^3.2.1",
     "ts-node": "^8.6.2"
   },
   "devDependencies": {
