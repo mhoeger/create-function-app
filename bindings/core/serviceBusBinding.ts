@@ -1,4 +1,4 @@
-import { BindingBase, Trigger, OutputBinding } from "./bindings"
+import { BindingBase, Trigger, OutputBinding } from "../../src/types/bindings/bindings"
 
 /**
  * Service bus binding

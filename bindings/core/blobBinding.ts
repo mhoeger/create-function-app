@@ -1,4 +1,4 @@
-import { BindingBase, Trigger, InputBinding, OutputBinding } from "./bindings"
+import { BindingBase, Trigger, InputBinding, OutputBinding } from "../../src/types/bindings/bindings"
 
 /**
  * Blob Binding

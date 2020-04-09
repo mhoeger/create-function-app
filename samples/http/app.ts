@@ -3,7 +3,7 @@ import { HostOptions } from "../../src/types/hostConfig"
 import { InvocationContext } from "./common/interfaces"
 import { getExampleClient } from "./services/fake-clients"
 import { functions } from "./functions"
-import { HttpTriggerType } from "../../src/types/bindings"
+import { HttpTriggerType } from "../../bindings"
 
 const options: HostOptions = {
     version: "2.0",

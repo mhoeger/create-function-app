@@ -1,5 +1,5 @@
 import { AzureFunctionDefinition } from "../../src/azure-functions"
-import { QueueTrigger, HttpTrigger, QueueOutput, CosmosDbOutput, HttpResponse } from "../../src/types/bindings"
+import { QueueTrigger, HttpTrigger, QueueOutput, CosmosDbOutput, HttpResponse } from "../../bindings"
 import { processOrder } from "./handlers/processOrder"
 import { acknowledgeOrder } from "./handlers/acknowledgeOrder"
 

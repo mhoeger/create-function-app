@@ -1,4 +1,4 @@
-import { BindingBase, Trigger } from "./bindings"
+import { BindingBase, Trigger } from "../../src/types/bindings/bindings"
 
 /**
  * Timer binding

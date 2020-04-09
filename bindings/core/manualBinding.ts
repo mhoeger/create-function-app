@@ -1,4 +1,4 @@
-import { BindingBase } from "./bindings"
+import { BindingBase } from "../../src/types/bindings/bindings"
 
 /**
  * Manual Binding

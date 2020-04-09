@@ -1,4 +1,4 @@
-import { Trigger, OutputBinding, TriggerType } from "./bindings"
+import { Trigger, OutputBinding, TriggerType } from "../../src/types/bindings/bindings"
 
 export const HttpTriggerType: TriggerType = "httpTrigger";
 

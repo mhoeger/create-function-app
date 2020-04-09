@@ -1,4 +1,4 @@
-import { BindingBase, Trigger, OutputBinding, TriggerType } from "./bindings"
+import { BindingBase, Trigger, OutputBinding, TriggerType } from "../../src/types/bindings/bindings"
 
 export const QueueTriggerType: TriggerType = "queueTrigger";
 
