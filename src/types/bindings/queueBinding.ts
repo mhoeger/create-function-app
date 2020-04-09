@@ -1,4 +1,6 @@
-import { BindingBase, Trigger, OutputBinding } from "./bindings"
+import { BindingBase, Trigger, OutputBinding, TriggerType } from "./bindings"
+
+export const QueueTriggerType: TriggerType = "queueTrigger";
 
 /**
  * Queue binding
@@ -30,7 +32,7 @@ class QueueBinding extends BindingBase {
 }
 
 export class QueueTrigger extends QueueBinding implements Trigger {
-    public type: string = "queueTrigger";
+    public type: string = QueueTriggerType;
     public direction: "in" = "in";
 }
 

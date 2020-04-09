@@ -1,5 +1,6 @@
 export * from "./bindings"
 export * from "./blobBinding"
+export * from "./cosmosDbBinding"
 export * from "./eventHubBinding"
 export * from "./httpBinding"
 export * from "./manualBinding"

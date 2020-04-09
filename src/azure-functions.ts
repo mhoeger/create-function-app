@@ -1,7 +1,7 @@
 import { AzureFunction, Context } from "@azure/functions"
 import { HostOptions } from "./types/hostConfig"
 import { FunctionConfiguration } from "./types/functionConfig"
-import { Trigger, InputBinding, InOutBinding, OutputBinding, BindingBase, Binding } from "./types/bindings/bindings"
+import { Trigger, InputBinding, InOutBinding, OutputBinding, BindingBase, Binding, TriggerType } from "./types/bindings/bindings"
 import { writeFile, existsSync, mkdirSync } from "fs"
 import { promisify, isFunction } from "util"
 import { relative } from "path" 
@@ -53,12 +53,19 @@ export class FunctionApp {
         }
     }
 
-    public beforeEach(middleware: any): FunctionApp {
+    public beforeEach(middleware: any, filter?: TriggerType): FunctionApp {
         // TODO: we can also do object type binding here! find by name??
         let previousMiddle = this._middleware;
-        this._middleware = async (context) => {
+        this._middleware = async (context: Context) => {
             await previousMiddle(context);
-            await middleware(context);
+            if (filter) {
+                const matchingType = context.bindingDefinitions.filter((bindingDef) => { return bindingDef.type === filter });
+                if (matchingType.length > 0) {
+                    await middleware(context);
+                }
+            } else {
+                await middleware(context);
+            }
         }
         return this;
     }

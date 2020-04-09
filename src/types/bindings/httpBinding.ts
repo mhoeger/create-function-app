@@ -1,11 +1,13 @@
-import { Trigger, OutputBinding } from "./bindings"
+import { Trigger, OutputBinding, TriggerType } from "./bindings"
+
+export const HttpTriggerType: TriggerType = "httpTrigger";
 
 /**
  * Http request binding
  */
 export class HttpTrigger implements Trigger {
     public name: string;
-    public type: string = "httpTrigger";
+    public type: string = HttpTriggerType;
     public direction: "in" = "in";
     /**
      * "The function HTTP route template."

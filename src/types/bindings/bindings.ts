@@ -1,3 +1,5 @@
+export type TriggerType = string;
+
 export interface FunctionConfiguration {
     // /**
     //  * If set to true, the function will not be loaded, compiled, or triggered.

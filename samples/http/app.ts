@@ -1,64 +1,9 @@
-import { FunctionApp, AzureFunctionDefinition } from "../../src/azure-functions"
-import { QueueTrigger, HttpTrigger, QueueOutput, EventHubOutput, HttpResponse } from "../../src/types/bindings"
+import { FunctionApp } from "../../src/azure-functions"
 import { HostOptions } from "../../src/types/hostConfig"
-
 import { InvocationContext } from "./common/interfaces"
-import { sayHello } from "./functions/hello"
-import { sayGoodbye } from "./functions/goodbye"
 import { getExampleClient } from "./services/fake-clients"
-
-const functions: AzureFunctionDefinition[] = [
-    {
-        trigger: new HttpTrigger({
-            name: "req",
-            route: "/order",
-            methods: ["post"],
-            authLevel: "anonymous"
-        }),
-        handler: sayHello,
-        outputBindings: [
-            new HttpResponse({ bindingName: "res" }),
-            new QueueOutput({
-                name: "orderMessage",
-                queueName: "order-messages",
-                connection: "AzureStorage"
-            })
-        ],
-    },
-    {
-        trigger: new HttpTrigger({
-            name: "req",
-            route: "/order",
-            methods: ["delete"],
-            authLevel: "anonymous"
-        }),
-        handler: sayHello,
-        outputBindings: [
-            new HttpResponse({ bindingName: "res" }),
-            new QueueOutput({
-                name: "deleteMessage", 
-                queueName: "delete-messages",
-                connection: "AzureStorage"
-            })
-        ]
-    },
-    {
-        functionName: "QueueToEventHub",
-        trigger: new QueueTrigger({
-            name: "queueInput", 
-            queueName: "queuename",
-            connection: "AzureStorage"
-        }),
-        handler: sayGoodbye,
-        outputBindings: [
-            new EventHubOutput({ 
-                name: "eventHubMessage",
-                path: "path",
-                connection: "EventHubConnection"
-            })
-        ]
-    }
-]
+import { functions } from "./functions"
+import { HttpTriggerType } from "../../src/types/bindings"
 
 const options: HostOptions = {
     version: "2.0",
@@ -74,9 +19,7 @@ const app = new FunctionApp({
     functions,
     options
 });
-// before each function, do this
-// beforeeach on trigger type
-// for
+
 app.beforeEach(async (context: InvocationContext) => {
     context.log(`~~ Starting invocation: '${context.invocationId}' ~~`);
     context.exampleClient = getExampleClient();
@@ -86,6 +29,10 @@ app.beforeEach(async (context: InvocationContext) => {
     const name = (context.req.query.name || (context.req.body && context.req.body.name));
     context.name = name;
 });
+
+app.beforeEach(async (context: InvocationContext) => {
+    context.log.warn("This is an Http triggered function.")
+}, HttpTriggerType);
 
 export = app;
 
@@ -113,14 +60,9 @@ export = app;
 //     }
 //   }
 
-
-
-
 // some sort of init??
 // - cache should be first class
 //   - this could be a "per invocations", "per lifetime"
 // become serverless framework on build step?
 // filter on trigger type??
 // - function.json generation - look at bindings.js!!
-
-
