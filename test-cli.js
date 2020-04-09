@@ -1,5 +1,8 @@
-let app = require("./app");
+const appLocation = "./dist/samples/http/app.js";
+const outputPath = "./out";
 
-app.generateMetadata().then(() => {
+let app = require(appLocation);
+
+app.generateMetadata(outputPath, appLocation).then(() => {
     console.log("done for real!!");
 })

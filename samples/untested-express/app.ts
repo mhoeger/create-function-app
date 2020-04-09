@@ -1,4 +1,4 @@
-import { FunctionApp } from "../../dist/src/azure-functions"
+import { FunctionApp } from "../../src/azure-functions"
 
 const express = require("express");
 

@@ -4,6 +4,7 @@ import { FunctionConfiguration } from "./types/functionConfig"
 import { Trigger, InputBinding, InOutBinding, OutputBinding, BindingBase, Binding } from "./types/bindings/bindings"
 import { writeFile, existsSync, mkdirSync } from "fs"
 import { promisify, isFunction } from "util"
+import { relative } from "path" 
 
 export interface AzureFunctionDefinition {
     trigger: Trigger;
@@ -62,23 +63,25 @@ export class FunctionApp {
         return this;
     }
 
-    public async generateMetadata() {
+    public async generateMetadata(functionRoot: string, appLocation: string) {
         const writeFileAsync = promisify(writeFile);
         let promises = [];
+        this.ensureDirectoryExistence(functionRoot);
         // write function.jsons 
         for (const func of this._functionConfigurations) {
-            const path = func.functionName
-            const functionConfig = this.getFunctionConfig(func)
+            const path = `${functionRoot}/${func.functionName}`;
+            const pathToApp = relative(path, appLocation);
+            const functionConfig = this.getFunctionConfig(func, pathToApp)
             this.ensureDirectoryExistence(path);
             promises.push(writeFileAsync(`${path}/function.json`, functionConfig));
         }
         // write host.jsons
         const hostConfig = JSON.stringify(this._hostOptions);
-        promises.push(writeFileAsync('host.json', hostConfig));
+        promises.push(writeFileAsync(`${functionRoot}/host.json`, hostConfig));
 
         // write a local.setting.json
         const settings = JSON.stringify(this.localSettings);
-        promises.push(writeFileAsync('local.settings.json', settings));
+        promises.push(writeFileAsync(`${functionRoot}/local.settings.json`, settings));
 
         // wait for all to return
         await Promise.all(promises);
@@ -140,11 +143,11 @@ export class FunctionApp {
     }
 
     // TODO: this should be an interchangeable converter
-    private getFunctionConfig (func: AzureFunctionDefinition): string {
+    private getFunctionConfig (func: AzureFunctionDefinition, pathToApp: string): string {
         const functionName = func.functionName
         const configuration: FunctionConfiguration = {
             bindings: [],
-            scriptFile: "../app.js",
+            scriptFile: pathToApp,
             entryPoint: functionName
         }
 
@@ -172,6 +175,7 @@ export class FunctionApp {
         if (existsSync(dirname)) {
           return true;
         }
+        console.warn("This part is only good for node v10.12 and above..!")
         mkdirSync(dirname, { recursive: true });
       }
 
