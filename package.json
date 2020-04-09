@@ -3,12 +3,11 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node generate-jsons.js",
     "watch": "tsc -w",
     "prestart": "npm run build",
-    "start:host": "func start --prefix future_dist",
+    "start:host": "func start --prefix out",
     "start": "npm run start:host & npm run watch",
-    "start:express": "npm run prestart && func start --prefix future_express_dist",
     "build:production": "npm run prestart && npm prune --production",
     "test": "ts-node test.ts"
   },
