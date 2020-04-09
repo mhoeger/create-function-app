@@ -39,4 +39,3 @@ export interface BindingBase {
   dataType?: "string" | "binary" | "stream";
   [k: string]: any;
 }
- 

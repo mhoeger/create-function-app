@@ -1,11 +1,14 @@
 import { AzureFunction, Context } from "@azure/functions"
-import { HostOptions } from "./hostConfig"
-import { Trigger, InputBinding, InOutBinding, OutputBinding } from "./functionConfig"
+import { HostOptions } from "./types/hostConfig"
+import { FunctionConfiguration } from "./types/functionConfig"
+import { Trigger, InputBinding, InOutBinding, OutputBinding, BindingBase, Binding } from "./types/bindings/bindings"
+import { writeFile, existsSync, mkdirSync } from "fs"
+import { promisify, isFunction } from "util"
 
 export interface AzureFunctionDefinition {
     trigger: Trigger;
     handler: AzureFunction;
-    name?: string;
+    functionName?: string;
     inputBindings?: (InputBinding|InOutBinding)[];
     outputBindings?: OutputBinding[];
 }
@@ -22,24 +25,35 @@ export class FunctionApp {
         extensionBundle: {
             id: "Microsoft.Azure.Functions.ExtensionBundle",
             version: "[1.*, 2.0.0)"
+        },
+        extensions: {
+            http: {
+                routePrefix: ""
+            }
         }
     };
     private readonly requiredHostOptions: HostOptions = {
         version: "2.0"
     };
+    private readonly localSettings = {
+        IsEncrypted: false,
+        Values: {
+          FUNCTIONS_WORKER_RUNTIME: "node",
+          AzureWebJobsStorage: "{AzureWebJobsStorage}"
+        }
+    };
 
     // host.json and local.settings.json... what to do??
     constructor(setup: { functions: AzureFunctionDefinition[], options?: HostOptions }) {
         let { functions, options } = setup; 
-        this._functionConfigurations = functions;
         this._hostOptions = Object.assign({}, this.defaultHostOptions, options, this.requiredHostOptions);        
         for (const func of functions) {
-            const name = this.resolveName(func.trigger.type, func.name);
-            this.addFunctionInternal(name, func.handler);
+            this.addFunctionInternal(func);
         }
     }
 
     public beforeEach(middleware: any): FunctionApp {
+        // TODO: we can also do object type binding here! find by name??
         let previousMiddle = this._middleware;
         this._middleware = async (context) => {
             await previousMiddle(context);
@@ -48,20 +62,38 @@ export class FunctionApp {
         return this;
     }
 
-    public generateMetadata() {
-        // TODO
+    public async generateMetadata() {
+        const writeFileAsync = promisify(writeFile);
+        let promises = [];
+        // write function.jsons 
+        for (const func of this._functionConfigurations) {
+            const path = func.functionName
+            const functionConfig = this.getFunctionConfig(func)
+            this.ensureDirectoryExistence(path);
+            promises.push(writeFileAsync(`${path}/function.json`, functionConfig));
+        }
+        // write host.jsons
+        const hostConfig = JSON.stringify(this._hostOptions);
+        promises.push(writeFileAsync('host.json', hostConfig));
+
+        // write a local.setting.json
+        const settings = JSON.stringify(this.localSettings);
+        promises.push(writeFileAsync('local.settings.json', settings));
+
+        // wait for all to return
+        await Promise.all(promises);
+        console.log("Done generating files!");
     }
 
-    public addFunction(trigger: Trigger, handler: AzureFunction, name?: string, inputBindings?: (InputBinding|InOutBinding)[], outputBindings?: OutputBinding[]) {
-        this._functionConfigurations.push({
+    public addFunction(trigger: Trigger, handler: AzureFunction, functionName?: string, inputBindings?: (InputBinding|InOutBinding)[], outputBindings?: OutputBinding[]) {
+        const functionDefinition: AzureFunctionDefinition = {
             trigger,
             handler,
-            name,
+            functionName,
             inputBindings,
             outputBindings
-        });
-        const resolvedName = this.resolveName(trigger.type, name);
-        this.addFunctionInternal(resolvedName, handler);
+        };
+        this.addFunctionInternal(functionDefinition);
     }
 
     private resolveName(triggerType: string, givenName?: string) {
@@ -76,10 +108,23 @@ export class FunctionApp {
     }
  
     // todo: warn on no http response as output?
-    private addFunctionInternal(name: string, funcCode: AzureFunction) {
+    private addFunctionInternal(func: AzureFunctionDefinition) {
+        const name = this.resolveName(func.trigger.type, func.functionName);
+        
+        if (!isFunction(func.handler)) {
+            throw new Error(`Function '${name}' must include a handler that is a valid function.`);
+        }
+
+        // Add to internal list
+        func.functionName = name;
+        this._functionConfigurations.push(func);
+
+        // Assign property name
         this[`${name}`] = async (context, ...args) => {
+            console.log("Test!");
+            console.log(JSON.stringify(this._middleware));
             let finalValue = null;
-            let next = () => { finalValue = funcCode(context, ...args) };
+            let next = () => { finalValue = func.handler(context, ...args) };
 
             let previousDone = context.done;
             let wrappedDone = (err, result) => {
@@ -89,10 +134,70 @@ export class FunctionApp {
             }
             await this._middleware(context);
             context.done = wrappedDone;
-            return funcCode(context, ...args); 
+            return func.handler(context, ...args); 
         };
         return this;
     }
+
+    // TODO: this should be an interchangeable converter
+    private getFunctionConfig (func: AzureFunctionDefinition): string {
+        const functionName = func.functionName
+        const configuration: FunctionConfiguration = {
+            bindings: [],
+            scriptFile: "../app.js",
+            entryPoint: functionName
+        }
+
+        const sanitizedTrigger = this.toBindingConfiguration(func.trigger, functionName);
+        configuration.bindings.push(sanitizedTrigger);
+
+        if (func.inputBindings) {
+            for (const input of func.inputBindings) {
+                const sanitizedInput = this.toBindingConfiguration(input, functionName)
+                configuration.bindings.push(sanitizedInput);
+            }
+        }
+
+        if (func.outputBindings) {
+            for (const output of func.outputBindings) {
+                const sanitizedOutput = this.toBindingConfiguration(output, functionName)
+                configuration.bindings.push(sanitizedOutput);
+            }
+        }
+
+        return JSON.stringify(configuration);
+    }
+
+    private ensureDirectoryExistence(dirname) {
+        if (existsSync(dirname)) {
+          return true;
+        }
+        mkdirSync(dirname, { recursive: true });
+      }
+
+    private toBindingConfiguration(binding: BindingBase, functionName: string): Binding {
+        // if we can't find getRequiredProperties or getOptionalProperties
+        if (!isFunction(binding.getRequiredProperties) || !isFunction(binding.getOptionalProperties)) {
+            return binding;
+        }
+
+        let sanitizedConfiguration = { };
+        for (const required of binding.getRequiredProperties()) {
+            if (binding[required] === undefined || binding[required] === null) {
+                throw new Error(`Could not find required property ${required} for function ${functionName}`);
+            }
+            sanitizedConfiguration[required] = binding[required];
+        }
+
+        for (const optional of binding.getOptionalProperties()) {
+            if (binding[optional] !== undefined && binding[optional] !== null) {
+                sanitizedConfiguration[optional] = binding[optional];
+            }
+        }
+
+        return sanitizedConfiguration as Binding;
+    }
+
     // public post(endware: any): FunctionApp {
     //     let previousEnd = this._endware;
     //     this._endware = async (context) => {

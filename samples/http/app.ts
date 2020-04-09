@@ -1,6 +1,6 @@
 import { FunctionApp, AzureFunctionDefinition } from "../../src/azure-functions"
-import { QueueTrigger, HttpTrigger, QueueOutput, EventHubOutput, HttpResponse } from "../../src/functionConfig"
-import { HostOptions } from "../../src/hostConfig"
+import { QueueTrigger, HttpTrigger, QueueOutput, EventHubOutput, HttpResponse } from "../../src/types/bindings"
+import { HostOptions } from "../../src/types/hostConfig"
 
 import { InvocationContext } from "./common/interfaces"
 import { sayHello } from "./functions/hello"
@@ -10,7 +10,7 @@ import { getExampleClient } from "./services/fake-clients"
 const functions: AzureFunctionDefinition[] = [
     {
         trigger: new HttpTrigger({
-            bindingName: "req",
+            name: "req",
             route: "/order",
             methods: ["post"],
             authLevel: "anonymous"
@@ -19,15 +19,15 @@ const functions: AzureFunctionDefinition[] = [
         outputBindings: [
             new HttpResponse({ bindingName: "res" }),
             new QueueOutput({
-                bindingName: "orderMessage",
+                name: "orderMessage",
                 queueName: "order-messages",
-                connectionSetting: "AzureStorage"
+                connection: "AzureStorage"
             })
         ],
     },
     {
         trigger: new HttpTrigger({
-            bindingName: "req",
+            name: "req",
             route: "/order",
             methods: ["delete"],
             authLevel: "anonymous"
@@ -36,21 +36,26 @@ const functions: AzureFunctionDefinition[] = [
         outputBindings: [
             new HttpResponse({ bindingName: "res" }),
             new QueueOutput({
-                bindingName: "deleteMessage", 
+                name: "deleteMessage", 
                 queueName: "delete-messages",
-                connectionSetting: "AzureStorage"
+                connection: "AzureStorage"
             })
         ]
     },
     {
+        functionName: "QueueToEventHub",
         trigger: new QueueTrigger({
-            bindingName: "queueInput", 
+            name: "queueInput", 
             queueName: "queuename",
-            connectionSetting: "AzureStorage"
+            connection: "AzureStorage"
         }),
         handler: sayGoodbye,
         outputBindings: [
-            new EventHubOutput({ bindingName: "eventHubMessage" })
+            new EventHubOutput({ 
+                name: "eventHubMessage",
+                path: "path",
+                connection: "EventHubConnection"
+            })
         ]
     }
 ]
@@ -59,7 +64,7 @@ const options: HostOptions = {
     version: "2.0",
     logging: {
         logLevel: {
-            default: "Warning"
+            default: "Trace"
         }
     }
 };

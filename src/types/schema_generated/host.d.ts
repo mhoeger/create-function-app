@@ -273,15 +273,6 @@ export interface Version2 {
   functionTimeout?: FunctionTimeout;
   healthMonitor?: HealthMonitor;
   /**
-   * Configuration settings for Language Workers.
-   */
-  languageWorker?: {
-    /**
-     * Specifies full path of the directory for language workers
-     */
-    workersDirectory?: string;
-  };
-  /**
    * Configuration settings for logging.
    */
   logging?: {
