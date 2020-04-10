@@ -83,11 +83,11 @@ export class FunctionApp {
             promises.push(writeFileAsync(`${path}/function.json`, functionConfig));
         }
         // write host.jsons
-        const hostConfig = JSON.stringify(this._hostOptions);
+        const hostConfig = JSON.stringify(this._hostOptions, null, '\t');
         promises.push(writeFileAsync(`${functionRoot}/host.json`, hostConfig));
 
         // write a local.setting.json
-        const settings = JSON.stringify(this.localSettings);
+        const settings = JSON.stringify(this.localSettings, null, '\t');
         promises.push(writeFileAsync(`${functionRoot}/local.settings.json`, settings));
 
         // wait for all to return
@@ -131,8 +131,6 @@ export class FunctionApp {
 
         // Assign property name
         this[`${name}`] = async (context, ...args) => {
-            console.log("Test!");
-            console.log(JSON.stringify(this._middleware));
             let finalValue = null;
             let next = () => { finalValue = func.handler(context, ...args) };
 
@@ -175,7 +173,7 @@ export class FunctionApp {
             }
         }
 
-        return JSON.stringify(configuration);
+        return JSON.stringify(configuration, null, '\t');
     }
 
     private ensureDirectoryExistence(dirname) {

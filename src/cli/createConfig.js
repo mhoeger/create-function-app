@@ -88,7 +88,7 @@ module.exports.cli = function (args) {
     if (options.help) {
         help(command);
     } else if (command === "init") {
-        console.log("todo!");
+        console.warn("todo!");
     } else if (options.appPath && options.out) {
         generateJsons(options.appPath, options.out);
     }
