@@ -22,7 +22,7 @@ This is in a very early stage, the most helpful feedback will be on the intuitiv
 ## To Do
 - Don't require Function app root to be the build output folder. In other words, we shouldn't have to run `func start --prefix out`... it should integrate seemlessly.
     - The nested folder constraints really kill us here: https://github.com/Azure/azure-functions-host/issues/5373
-    - I consider resolving issue 5373 a blocker on this project.
+    - **I consider issue 5373 as a blocker to this project.**
 - Be able to init and create new functions
 - Be able to convert old functions to new format.
 
