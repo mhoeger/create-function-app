@@ -1,0 +1,27 @@
+{
+    "name": "create-function-app",
+    "version": "0.0.0",
+    "description": "Azure Functions JavaScript app model",
+    "scripts": {
+        "prepublishOnly": "node lib/copy-metadata.js"
+    },
+    "author": "mhoeger",
+    "license": "MIT",
+    "preferGlobal": true,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mhoeger/create-function-app.git"
+    },
+    "bin": {
+        "funcjs": "./main.js"
+    },
+    "os": [
+        "win32",
+        "darwin",
+        "linux"
+    ],
+    "engines": {
+        "node": ">=8.0.0"
+    },
+    "dependencies": { }
+}

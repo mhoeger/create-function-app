@@ -36,18 +36,11 @@ export class FunctionApp {
     private readonly requiredHostOptions: HostOptions = {
         version: "2.0"
     };
-    private readonly localSettings = {
-        IsEncrypted: false,
-        Values: {
-          FUNCTIONS_WORKER_RUNTIME: "node",
-          AzureWebJobsStorage: "{AzureWebJobsStorage}"
-        }
-    };
 
-    // host.json and local.settings.json... what to do??
-    constructor(setup: { functions: AzureFunctionDefinition[], options?: HostOptions }) {
-        let { functions, options } = setup; 
-        this._hostOptions = Object.assign({}, this.defaultHostOptions, options, this.requiredHostOptions);        
+    // host.json and functions
+    constructor(options: { functions: AzureFunctionDefinition[], hostOptions?: HostOptions }) {
+        let { functions, hostOptions } = options; 
+        this._hostOptions = Object.assign({}, this.defaultHostOptions, hostOptions, this.requiredHostOptions);        
         for (const func of functions) {
             this.addFunctionInternal(func);
         }
@@ -85,10 +78,6 @@ export class FunctionApp {
         // write host.jsons
         const hostConfig = JSON.stringify(this._hostOptions, null, '\t');
         promises.push(writeFileAsync(`${functionRoot}/host.json`, hostConfig));
-
-        // write a local.setting.json
-        const settings = JSON.stringify(this.localSettings, null, '\t');
-        promises.push(writeFileAsync(`${functionRoot}/local.settings.json`, settings));
 
         // wait for all to return
         await Promise.all(promises);

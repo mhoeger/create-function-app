@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc && cd ./src/cli && node main.js build -p '../../dist/samples/http/app.js' -o '../../out'",
+    "build": "tsc && cd ./src/cli && node main.js build -p '../../dist/samples/http/app.js' -o '../../out' -e '../../samples/http/.env'",
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start:host": "func start --prefix out",

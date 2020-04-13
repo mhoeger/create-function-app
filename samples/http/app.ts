@@ -2,10 +2,10 @@ import { FunctionApp } from "../../src/azure-functions"
 import { HostOptions } from "../../src/types/hostConfig"
 import { InvocationContext } from "./common/interfaces"
 import { getExampleClient } from "./services/fake-clients"
-import { functions } from "./functions"
+import { functions } from "./handlers/functions"
 import { HttpTriggerType } from "../../bindings"
 
-const options: HostOptions = {
+const hostOptions: HostOptions = {
     version: "2.0",
     logging: {
         logLevel: {
@@ -14,10 +14,9 @@ const options: HostOptions = {
     }
 };
 
-// - local.settings.json??? also host.json not needed??
 const app = new FunctionApp({
     functions,
-    options
+    hostOptions
 });
 
 app.beforeEach(async (context: InvocationContext) => {

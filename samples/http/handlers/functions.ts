@@ -1,7 +1,7 @@
-import { AzureFunctionDefinition } from "../../src/azure-functions"
-import { QueueTrigger, HttpTrigger, QueueOutput, CosmosDbOutput, HttpResponse } from "../../bindings"
-import { processOrder } from "./handlers/processOrder"
-import { acknowledgeOrder } from "./handlers/acknowledgeOrder"
+import { AzureFunctionDefinition } from "../../../src/azure-functions"
+import { QueueTrigger, HttpTrigger, QueueOutput, CosmosDbOutput, HttpResponse } from "../../../bindings"
+import { processOrder } from "./processOrder"
+import { acknowledgeOrder } from "./acknowledgeOrder"
 
 const orderQueue = {
     name: "order-messages",
