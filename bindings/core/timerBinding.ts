@@ -1,4 +1,4 @@
-import { BindingBase, Trigger } from "../../src/types/bindings/bindings"
+import { BindingBase, Trigger, Binding } from "../../src/types/bindings"
 
 /**
  * Timer binding
@@ -31,11 +31,15 @@ export class TimerTrigger extends BindingBase implements Trigger {
         this.runOnStartup = parameters.runOnStartup;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "schedule"];
-    }
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.schedule) throw new Error("Missing required property 'schedule'")
 
-    public getOptionalProperties() {
-        return [...super.getOptionalProperties(), "useMonitor", "runOnStartup"];
+        const serviceBusProperties = {
+            schedule: this.schedule,
+            useMonitor: this.useMonitor,
+            runOnStartup: this.runOnStartup
+        };
+        return Object.assign({}, coreProperties, serviceBusProperties);
     }
 }

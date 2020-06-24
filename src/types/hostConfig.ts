@@ -285,7 +285,7 @@ export interface Version2 {
        * The default level for logging. If a category level is not specified, this value is used.
        */
       default?: "Critical" | "Debug" | "Error" | "Information" | "None" | "Trace" | "Warning";
-      [k: string]: "Critical" | "Debug" | "Error" | "Information" | "None" | "Trace" | "Warning";
+      [k: string]: "Critical" | "Debug" | "Error" | "Information" | "None" | "Trace" | "Warning" | undefined;
     };
     /**
      * Configuration settings for Application Insights logging.

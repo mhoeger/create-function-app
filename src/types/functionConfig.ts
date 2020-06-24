@@ -1,4 +1,4 @@
-import { BindingBase } from "./bindings/bindings"
+import { Binding } from "./bindings/bindings"
 
 export interface FunctionConfiguration {
     /**
@@ -14,7 +14,7 @@ export interface FunctionConfiguration {
     /**
      * A list of function bindings.
      */
-    bindings: BindingBase[];
+    bindings: Binding[];
 
     [k: string]: any;
 }

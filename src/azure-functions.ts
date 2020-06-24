@@ -1,24 +1,21 @@
 import { AzureFunction, Context } from "@azure/functions"
 import { HostOptions } from "./types/hostConfig"
 import { FunctionConfiguration } from "./types/functionConfig"
-import { Trigger, InputBinding, InOutBinding, OutputBinding, BindingBase, Binding, TriggerType } from "./types/bindings/bindings"
+import { FunctionDefinition, FunctionDeclaration } from "./types/functionDefinition"
+import { Trigger, InputBinding, InOutBinding, OutputBinding, Binding, TriggerType } from "./types/bindings"
 import { writeFile, existsSync, mkdirSync } from "fs"
 import { promisify, isFunction } from "util"
 import { relative } from "path" 
 
-export interface AzureFunctionDefinition {
-    trigger: Trigger;
-    handler: AzureFunction;
-    functionName?: string;
-    inputBindings?: (InputBinding|InOutBinding)[];
-    outputBindings?: OutputBinding[];
+interface InternalFunctionDefinition extends FunctionDefinition {
+    functionName: string;
 }
 
 export class FunctionApp {
     private count = 1;
     private _middleware = async (context) => { };
     private _endware = async(context) => { };
-    private _functionConfigurations: AzureFunctionDefinition[] = [];
+    private _functionConfigurations: InternalFunctionDefinition[] = [];
     private _hostOptions;
 
     private readonly defaultHostOptions: HostOptions = {
@@ -38,10 +35,12 @@ export class FunctionApp {
     };
 
     // host.json and functions
-    constructor(options: { functions: AzureFunctionDefinition[], hostOptions?: HostOptions }) {
+    constructor(options: { functions: FunctionDeclaration, hostOptions?: HostOptions }) {
         let { functions, hostOptions } = options; 
         this._hostOptions = Object.assign({}, this.defaultHostOptions, hostOptions, this.requiredHostOptions);        
-        for (const func of functions) {
+        for (const funcName in functions) {
+            const func = functions[funcName] as InternalFunctionDefinition;
+            func.functionName = funcName;
             this.addFunctionInternal(func);
         }
     }
@@ -85,7 +84,7 @@ export class FunctionApp {
     }
 
     public addFunction(trigger: Trigger, handler: AzureFunction, functionName?: string, inputBindings?: (InputBinding|InOutBinding)[], outputBindings?: OutputBinding[]) {
-        const functionDefinition: AzureFunctionDefinition = {
+        const functionDefinition: InternalFunctionDefinition = {
             trigger,
             handler,
             functionName,
@@ -107,9 +106,9 @@ export class FunctionApp {
     }
  
     // todo: warn on no http response as output?
-    private addFunctionInternal(func: AzureFunctionDefinition) {
+    private addFunctionInternal(func: InternalFunctionDefinition) {
         const name = this.resolveName(func.trigger.type, func.functionName);
-        
+
         if (!isFunction(func.handler)) {
             throw new Error(`Function '${name}' must include a handler that is a valid function.`);
         }
@@ -137,7 +136,7 @@ export class FunctionApp {
     }
 
     // TODO: this should be an interchangeable converter
-    private getFunctionConfig (func: AzureFunctionDefinition, pathToApp: string): string {
+    private getFunctionConfig (func: InternalFunctionDefinition, pathToApp: string): string {
         const functionName = func.functionName
         const configuration: FunctionConfiguration = {
             bindings: [],
@@ -173,27 +172,28 @@ export class FunctionApp {
         mkdirSync(dirname, { recursive: true });
       }
 
-    private toBindingConfiguration(binding: BindingBase, functionName: string): Binding {
+    private toBindingConfiguration(binding: Binding, functionName: string): Binding {
         // if we can't find getRequiredProperties or getOptionalProperties
-        if (!isFunction(binding.getRequiredProperties) || !isFunction(binding.getOptionalProperties)) {
+        if (!isFunction(binding.getProperties)) {
             return binding;
         }
 
-        let sanitizedConfiguration = { };
-        for (const required of binding.getRequiredProperties()) {
-            if (binding[required] === undefined || binding[required] === null) {
-                throw new Error(`Could not find required property ${required} for function ${functionName}`);
-            }
-            sanitizedConfiguration[required] = binding[required];
-        }
+        return binding.getProperties() as Binding;
+        // let sanitizedConfiguration = { };
+        // for (const required of binding.getRequiredProperties()) {
+        //     if (binding[required] === undefined || binding[required] === null) {
+        //         throw new Error(`Could not find required property ${required} for function ${functionName}`);
+        //     }
+        //     sanitizedConfiguration[required] = binding[required];
+        // }
 
-        for (const optional of binding.getOptionalProperties()) {
-            if (binding[optional] !== undefined && binding[optional] !== null) {
-                sanitizedConfiguration[optional] = binding[optional];
-            }
-        }
+        // for (const optional of binding.getOptionalProperties()) {
+        //     if (binding[optional] !== undefined && binding[optional] !== null) {
+        //         sanitizedConfiguration[optional] = binding[optional];
+        //     }
+        // }
 
-        return sanitizedConfiguration as Binding;
+        // return sanitizedConfiguration as Binding;
     }
 
     // public post(endware: any): FunctionApp {

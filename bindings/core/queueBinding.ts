@@ -1,4 +1,4 @@
-import { BindingBase, Trigger, OutputBinding, TriggerType } from "../../src/types/bindings/bindings"
+import { BindingBase, Binding, Trigger, OutputBinding, TriggerType } from "../../src/types/bindings"
 
 export const QueueTriggerType: TriggerType = "queueTrigger";
 
@@ -26,8 +26,16 @@ class QueueBinding extends BindingBase {
         this.queueName = parameters.queueName;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "queueName", "connection"];
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.queueName) throw new Error("Missing required property 'queueName'")
+        if (!this.connection) throw new Error("Missing required property 'connection'")
+
+        const queueProperties = {
+            queueName: this.queueName,
+            connection: this.connection
+        };
+        return Object.assign({}, coreProperties, queueProperties);
     }
 }
 

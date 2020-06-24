@@ -26,8 +26,11 @@ This is in a very early stage, the most helpful feedback will be on the intuitiv
 - Be able to init and create new functions
 - Be able to convert old functions to new format.
 
+### Extensibility
+- Change getRequiredProperties/getOptionalProperties => getConfig or something and include validation for required.
+- Make function name required??
+
 ## Challenges
 - Requires a "build step" which is not required for plain JavaScript. Luckily, converting JavaScript is fairly common practice.
     - Need to verify that integration with other build steps is ok. This should be fine though, as long as this is the last step in any generation pipeline. Thought should be put into making this an intuitive experience.
 - Templates. How to make them compatible with existing systems? We want to keep index.js but change function.json. Maybe this ties into work to convert old functions to new. 
-
