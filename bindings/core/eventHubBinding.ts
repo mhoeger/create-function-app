@@ -1,4 +1,4 @@
-import { BindingBase, Trigger, InputBinding, OutputBinding } from "../../src/types/bindings/bindings"
+import { BindingBase, Trigger, Binding, OutputBinding } from "../../src/types/bindings"
 
 /**
  * EventHub Binding
@@ -24,8 +24,16 @@ class EventHubBinding extends BindingBase {
         this.connection = parameters.connection;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "path", "connection"];
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.path) throw new Error("Missing required property 'path'")
+        if (!this.connection) throw new Error("Missing required property 'connection'")
+
+        const eventHubProperties = {
+            path: this.path,
+            connection: this.connection
+        };
+        return Object.assign({}, coreProperties, eventHubProperties);
     }
 }
 
@@ -54,12 +62,15 @@ export class EventHubTrigger extends EventHubBinding implements Trigger {
         this.cardinality = parameters.cardinality;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "consumerGroup"];
-    }
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.consumerGroup) throw new Error("Missing required property 'consumerGroup'")
 
-    public getOptionalProperties() {
-        return [...super.getOptionalProperties(), "cardinality"];
+        const eventHubProperties = {
+            consumerGroup: this.consumerGroup,
+            cardinality: this.cardinality
+        };
+        return Object.assign({}, coreProperties, eventHubProperties);
     }
 }
 

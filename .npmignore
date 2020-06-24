@@ -1,3 +1,4 @@
 out/
 samples/http
-src/
+bin
+.vscode

@@ -1,9 +1,9 @@
-import { BindingBase, Trigger, InputBinding, OutputBinding } from "../../src/types/bindings/bindings"
+import { AzFunctionBindingBase, Trigger, InputBinding, OutputBinding, Binding } from "../../src/types/bindings"
 
 /**
  * EventHub Binding
  */
-class CosmosDbBinding extends BindingBase {
+class CosmosDbBinding extends AzFunctionBindingBase {
     /**
      * 
      */
@@ -28,8 +28,17 @@ class CosmosDbBinding extends BindingBase {
         this.connectionStringSetting = parameters.connectionStringSetting;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "databaseName", "collectionName", "connectionStringSetting"];
+    public getProperties(): Binding {
+        if (!this.databaseName) throw new Error("Missing required property 'databaseName'")
+        if (!this.collectionName) throw new Error("Missing required property 'collectionName'")
+        if (!this.connectionStringSetting) throw new Error("Missing required property 'connectionStringSetting'")
+
+        const properties = {
+            path: this.databaseName,
+            collectionName: this.collectionName,
+            connectionStringSetting: this.connectionStringSetting
+        };
+        return Object.assign({}, super.getProperties(), properties);
     }
 }
 
@@ -96,12 +105,26 @@ export class CosmosDbTrigger extends CosmosDbBinding implements Trigger {
         this.preferredLocations = parameters.preferredLocations;
     }
 
-    public getOptionalProperties() {
-        return [...super.getOptionalProperties(), "leaseCollectionName", "createLeaseCollectionIfNotExists", 
-            "leaseConnectionStringSetting", "leaseDatabaseName", "leasesCollectionThroughput", 
-            "leaseCollectionPrefix", "feedPollDelay", "leaseAcquireInterval", "leaseExpirationInterval",
-            "leaseRenewInterval", "checkpointFrequency", "maxItemsPerInvocation", "startFromBeginning",
-            "preferredLocations"];
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+
+        const cosmosProperties = {
+            leaseCollectionName: this.leaseCollectionName,
+            createLeaseCollectionIfNotExists: this.createLeaseCollectionIfNotExists,
+            leaseConnectionStringSetting: this.leaseConnectionStringSetting,
+            leaseDatabaseName: this.leaseDatabaseName,
+            leasesCollectionThroughput: this.leasesCollectionThroughput,
+            leaseCollectionPrefix: this.leaseCollectionPrefix,
+            feedPollDelay: this.feedPollDelay,
+            leaseAcquireInterval: this.leaseAcquireInterval,
+            leaseExpirationInterval: this.leaseExpirationInterval,
+            leaseRenewInterval: this.leaseRenewInterval,
+            checkpointFrequency: this.checkpointFrequency,
+            maxItemsPerInvocation: this.maxItemsPerInvocation,
+            startFromBeginning: this.startFromBeginning,
+            preferredLocations: this.preferredLocations
+        };
+        return Object.assign({}, coreProperties, cosmosProperties);
     }
 }
 
@@ -131,12 +154,18 @@ export class CosmosDbInput extends CosmosDbBinding implements InputBinding {
         this.preferredLocations = parameters.preferredLocations;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "id", "partitionKey"];
-    }
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.id) throw new Error("Missing required property 'id'")
+        if (!this.partitionKey) throw new Error("Missing required property 'partitionKey'")
 
-    public getOptionalProperties() {
-        return [...super.getOptionalProperties(), "sqlQuery", "preferredLocations"];
+        const cosmosProperties = {
+            id: this.id,
+            partitionKey: this.partitionKey,
+            sqlQuery: this.sqlQuery,
+            preferredLocations: this.preferredLocations
+        };
+        return Object.assign({}, coreProperties, cosmosProperties);
     }
 }
 
@@ -169,11 +198,17 @@ export class CosmosDbOutput extends CosmosDbBinding implements OutputBinding {
         this.useMultipleWriteLocations = parameters.useMultipleWriteLocations;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "partitionKey"];
-    }
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.partitionKey) throw new Error("Missing required property 'partitionKey'")
 
-    public getOptionalProperties() {
-        return [...super.getOptionalProperties(), "createIfNotExists", "collectionThroughput", "preferredLocations", "useMultipleWriteLocations"];
+        const cosmosProperties = {
+            partitionKey: this.partitionKey,
+            createIfNotExists: this.createIfNotExists,
+            collectionThroughput: this.collectionThroughput,
+            preferredLocations: this.preferredLocations,
+            useMultipleWriteLocations: this.useMultipleWriteLocations
+        };
+        return Object.assign({}, coreProperties, cosmosProperties);
     }
 }

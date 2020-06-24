@@ -1,4 +1,4 @@
-import { Trigger, OutputBinding, TriggerType } from "../../src/types/bindings/bindings"
+import { Trigger, OutputBinding, TriggerType, Binding } from "../../src/types/bindings"
 
 export const HttpTriggerType: TriggerType = "httpTrigger";
 
@@ -39,12 +39,21 @@ export class HttpTrigger implements Trigger {
         this.webHookType = parameters.webHookType;
     }
 
-    public getRequiredProperties() {
-        return ["name", "type", "direction", "authLevel"];
-    }
+    public getProperties(): Binding {
+        if (!this.name) throw new Error("Missing required property 'name'")
+        if (!this.type) throw new Error("Missing required property 'type'")
+        if (!this.direction) throw new Error("Missing required property 'direction'")
+        if (!this.authLevel) throw new Error("Missing required property 'authLevel'")
 
-    public getOptionalProperties() {
-        return ["route", "webHookType", "methods"];
+        return {
+            name: this.name,
+            type: this.type,
+            direction: this.direction,
+            authLevel: this.authLevel,
+            route: this.route,
+            webHookType: this.webHookType,
+            methods: this.methods
+        };
     }
 }
 
@@ -59,11 +68,15 @@ export class HttpResponse implements OutputBinding {
         this.name = parameters.bindingName;
     }
 
-    public getRequiredProperties() {
-        return ["name", "type", "direction"];
-    }
+    public getProperties(): Binding {
+        if (!this.name) throw new Error("Missing required property 'name'")
+        if (!this.type) throw new Error("Missing required property 'type'")
+        if (!this.direction) throw new Error("Missing required property 'direction'")
 
-    getOptionalProperties() {
-        return [];
+        return {
+            name: this.name,
+            type: this.type,
+            direction: this.direction
+        };
     }
 }

@@ -1,4 +1,4 @@
-import { AzureFunctionDefinition } from "../../../src/azure-functions"
+import { FunctionDeclaration } from "../../../src/types"
 import { QueueTrigger, HttpTrigger, QueueOutput, CosmosDbOutput, HttpResponse } from "../../../bindings"
 import { processOrder } from "./processOrder"
 import { acknowledgeOrder } from "./acknowledgeOrder"
@@ -8,9 +8,8 @@ const orderQueue = {
     connection: "AzureWebJobsStorage"
 };
 
-export const functions: AzureFunctionDefinition[] = [
-    {
-        functionName: "OrderRequest",
+export const functions: FunctionDeclaration = {
+    OrderRequest: {
         trigger: new HttpTrigger({
             name: "req",
             route: "/order",
@@ -27,8 +26,7 @@ export const functions: AzureFunctionDefinition[] = [
             })
         ],
     },
-    {
-        functionName: "OrderProcessing",
+    OrderProcessing: {
         trigger: new QueueTrigger({
             name: "orderMessage", 
             queueName: orderQueue.name,
@@ -45,4 +43,4 @@ export const functions: AzureFunctionDefinition[] = [
             })
         ]
     }
-]
+}

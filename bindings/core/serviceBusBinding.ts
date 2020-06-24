@@ -1,4 +1,4 @@
-import { BindingBase, Trigger, OutputBinding } from "../../src/types/bindings/bindings"
+import { BindingBase, Trigger, OutputBinding, Binding } from "../../src/types/bindings"
 
 /**
  * Service bus binding
@@ -40,15 +40,21 @@ class ServiceBusBinding extends BindingBase {
         this.subscriptionName = parameters.subscriptionName;
         this.connection = parameters.connection;
         this.accessRights = parameters.accessRights;
-        this.dataType = parameters.dataType;
     }
 
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "connection", "subscriptionName", "connection"];
-    }
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.connection) throw new Error("Missing required property 'connection'")
+        if (!this.subscriptionName) throw new Error("Missing required property 'subscriptionName'")
 
-    public getOptionalProperties() {
-        return [...super.getOptionalProperties(), "queueName", "topicName", "accessRights"];
+        const serviceBusProperties = {
+            queueName: this.queueName,
+            connection: this.connection,
+            subscriptionName: this.subscriptionName,
+            topicName: this.topicName,
+            accessRights: this.accessRights
+        };
+        return Object.assign({}, coreProperties, serviceBusProperties);
     }
 }
 

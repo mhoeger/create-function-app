@@ -1,9 +1,9 @@
 {
   "name": "create-function-app",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "description": "",
-  "main": "dist/index.js",
-  "types" : "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types" : "dist/src/index.d.ts",
   "scripts": {
     "build": "tsc && cd ./src/cli && node main.js build -p '../../dist/samples/http/app.js' -o '../../out' -e '../../samples/http/.env'",
     "watch": "tsc -w",

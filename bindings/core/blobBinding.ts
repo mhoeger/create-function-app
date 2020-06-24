@@ -1,9 +1,9 @@
-import { BindingBase, Trigger, InputBinding, OutputBinding } from "../../src/types/bindings/bindings"
+import { AzFunctionBindingBase, Trigger, InputBinding, OutputBinding, Binding } from "../../src/types/bindings"
 
 /**
  * Blob Binding
  */
-class BlobBinding extends BindingBase {
+class BlobBinding extends AzFunctionBindingBase {
     /**
      * The path to the blob container
      */
@@ -12,10 +12,6 @@ class BlobBinding extends BindingBase {
      * An app setting (or environment variable) with the storage connection string to be used by this binding.
      */
     public connection: string;
-
-    public getRequiredProperties() {
-        return [...super.getRequiredProperties(), "path", "connection"];
-    }
 
     constructor(parameters: {
         name: string,  
@@ -26,6 +22,18 @@ class BlobBinding extends BindingBase {
         super(parameters);
         this.path = parameters.path;
         this.connection = parameters.connection;
+    }
+
+    public getProperties(): Binding {
+        const coreProperties = super.getProperties();
+        if (!this.path) throw new Error("Missing required property 'path'")
+        if (!this.connection) throw new Error("Missing required property 'connection'")
+
+        const blobProperties = {
+            path: this.path,
+            connection: this.connection
+        };
+        return Object.assign({}, coreProperties, blobProperties);
     }
 }
 
